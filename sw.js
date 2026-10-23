@@ -1,5 +1,5 @@
 // Offline cache for the Cymbal Density Calculator. Bump VERSION on every release.
-const VERSION = "cc-density-1.0.2";
+const VERSION = "cc-density-1.0.3";
 const FILES = [
   "./", "index.html", "manifest.webmanifest",
   "fonts/SourceSerif4-Semibold.woff2", "fonts/SourceSans3-Regular.woff2",
@@ -18,7 +18,8 @@ self.addEventListener("fetch", e => {
   const req = e.request;
   if (req.method !== "GET" || new URL(req.url).origin !== location.origin) return;
   if (req.mode === "navigate") {
-    e.respondWith(fetch(req).then(r => { const copy = r.clone(); caches.open(VERSION).then(c => c.put("index.html", copy)); return r; })
+    // no-cache: always check GitHub for a newer page instead of using the browser's 10-minute copy
+    e.respondWith(fetch(req, { cache: "no-cache" }).then(r => { const copy = r.clone(); caches.open(VERSION).then(c => c.put("index.html", copy)); return r; })
       .catch(() => caches.match("index.html")));
     return;
   }
