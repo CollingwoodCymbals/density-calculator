@@ -7,6 +7,9 @@ on:
       - "android/**"
       - ".github/workflows/android.yml"
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -25,3 +28,10 @@ jobs:
         with:
           name: app-release-unsigned
           path: android/app/build/outputs/bundle/release/*.aab
+      - name: Save the bundle to the android-build branch
+        run: |
+          mkdir /tmp/out && cp android/app/build/outputs/bundle/release/*.aab /tmp/out/app-release-unsigned.aab
+          cd /tmp/out && git init -q -b android-build
+          git config user.name "github-actions" && git config user.email "github-actions@users.noreply.github.com"
+          git add . && git commit -q -m "Unsigned bundle from ${GITHUB_SHA}"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" android-build
