@@ -1,5 +1,5 @@
 // Offline cache for the Cymbal Density Calculator. Bump VERSION on every release.
-const VERSION = "cc-density-1.1.0";
+const VERSION = "cc-density-1.2.0";
 const FILES = [
   "./", "index.html", "manifest.webmanifest",
   "fonts/SourceSerif4-Semibold.woff2", "fonts/SourceSans3-Regular.woff2",
@@ -8,7 +8,7 @@ const FILES = [
   "icons/apple-touch-icon.png", "icons/logo-small.png"
 ];
 self.addEventListener("install", e => {
-  e.waitUntil(caches.open(VERSION).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
+  e.waitUntil(caches.open(VERSION).then(c => c.addAll(FILES.map(f => new Request(f, { cache: "reload" })))).then(() => self.skipWaiting()));
 });
 self.addEventListener("activate", e => {
   e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== VERSION).map(k => caches.delete(k)))).then(() => self.clients.claim()));

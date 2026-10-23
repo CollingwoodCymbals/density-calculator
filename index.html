@@ -191,6 +191,7 @@ select{appearance:none;-webkit-appearance:none;background-image:linear-gradient(
 <!-- FAVOURITES -->
 <section class="screen" id="s-favs">
   <div class="head"><h1>Favourites</h1><span class="count" id="favCount"></span></div>
+  <button class="btn2" id="addFavBtn" style="margin:0 0 12px">+ Add a cymbal</button>
   <div class="banner" id="pickBanner" hidden><span>Tap a cymbal to use it in the calculator.</span><button id="pickCancel">Cancel</button></div>
   <input class="txt search" id="favSearch" type="text" placeholder="Search names, makers and notes" autocomplete="off">
   <div class="filters">
@@ -257,7 +258,7 @@ select{appearance:none;-webkit-appearance:none;background-image:linear-gradient(
     <a href="https://www.collingwoodcymbals.com" target="_blank" rel="noopener">Handmade cymbals &rsaquo;</a>
     <a href="https://www.collingwoodcymbals.com/contact" target="_blank" rel="noopener">Feedback or ideas? Contact me &rsaquo;</a>
   </div>
-  <div class="fine">Version 1.1 &middot; No ads, no sign-up, no data collected. Your favourites stay on this phone.</div>
+  <div class="fine">Version 1.2 &middot; No ads, no sign-up, no data collected. Your favourites stay on this phone.</div>
 </section>
 
 </div>
@@ -444,12 +445,13 @@ function renderFavs(){
     if(q&&(title(f)+" "+(f.maker||"")+" "+(f.type||"")+" "+(f.notes||"")).toLowerCase().indexOf(q)<0)return false;
     return true;}).sort(function(a,b){return (b.updated||0)-(a.updated||0);});
   var el=$("favList");
-  if(!F.length){el.innerHTML='<div class="empty-state"><b>No favourites yet</b><p>Put a cymbal’s size and weight into the calculator, then tap + Save.</p></div>';return;}
+  if(!F.length){el.innerHTML='<div class="empty-state"><b>No favourites yet</b><p>Tap + Add a cymbal above, or put a size and weight into the calculator and tap + Save.</p></div>';return;}
   if(!L.length){el.innerHTML='<div class="empty-state"><p>Nothing matches. Try clearing a filter.</p></div>';return;}
   el.innerHTML=L.map(function(f){
     return '<button class="item" data-id="'+f.id+'"><div><div class="nm">'+esc(title(f))+'</div><div class="meta">'+esc([f.maker||"Unknown",f.type||"",fmtLenU(f.d),fmtWtU(f.w)].filter(Boolean).join(" · "))+'</div></div><div class="dn">'+densShow(f.d,f.w)+'</div></button>';
   }).join("");
 }
+$("addFavBtn").addEventListener("click",function(){openSave(null,NaN,NaN,true);setTimeout(function(){$("sD").focus();},250);});
 ["favSearch","fMaker","fSize","fType"].forEach(function(id){$(id).addEventListener("input",renderFavs);});
 $("favList").addEventListener("click",function(e){var b=e.target.closest(".item");if(!b)return;var f=byId(b.dataset.id);if(!f)return;
   if(picking){useFav(f);setPick(false);return;} showDetail(f);});
@@ -487,15 +489,15 @@ function showSheet(id){$("dim").style.display="block";$(id).style.display="flex"
 function hideSheet(id){$(id).style.display="none";openSheets=openSheets.filter(function(x){return x!==id;});if(!openSheets.length)$("dim").style.display="none";}
 $("dim").addEventListener("click",function(){if(openSheets.length)hideSheet(openSheets[openSheets.length-1]);});
 
-var editing=null, sMaker="", sType="";
-function openSave(fav,dIn,wG){
-  editing=fav||null;
-  $("saveTitle").textContent=fav?"Edit cymbal":"Save to favourites";
+var editing=null, sMaker="", sType="", saveFromFavs=false;
+function openSave(fav,dIn,wG,fromFavs){
+  editing=fav||null;saveFromFavs=!!fromFavs;
+  $("saveTitle").textContent=fav?"Edit cymbal":(fromFavs?"Add a cymbal":"Save to favourites");
   $("sName").value=fav?fav.name||"":"";
   sMaker=fav?fav.maker||"":"";sType=fav?fav.type||"":"";
   $("sNotes").value=fav?fav.notes||"":"";
   var d=fav?fav.d:dIn,w=fav?fav.w:wG;
-  $("sD").value=fmtLen(d);$("sW").value=st.units.wt==="oz"?trim(w/OZ,1):String(Math.round(w));
+  $("sD").value=d>0?fmtLen(d):"";$("sW").value=w>0?(st.units.wt==="oz"?trim(w/OZ,1):String(Math.round(w))):"";
   $("sErr").style.display="none";$("newTypeWrap").hidden=true;$("newType").value="";
   renderMakerBtn();renderTypes();updSDens();showSheet("sheetSave");
 }
@@ -521,6 +523,7 @@ $("sSave").addEventListener("click",function(){
   if(!(d>0&&w>0)){$("sErr").style.display="block";return;}
   var now=Date.now(),rec={name:$("sName").value.trim(),maker:sMaker||"Unknown",type:sType,notes:$("sNotes").value.trim(),d:d,w:w,updated:now};
   if(editing){Object.assign(editing,rec);save();hideSheet("sheetSave");showDetail(editing);toast("Saved");}
+  else if(saveFromFavs){rec.id=uid();rec.created=now;st.favs.push(rec);save();hideSheet("sheetSave");renderFavs();toast("Added to favourites");}
   else{rec.id=uid();rec.created=now;st.favs.push(rec);st.calc.from=rec.id;save();hideSheet("sheetSave");recalc(false);toast("Saved to favourites");}
 });
 
