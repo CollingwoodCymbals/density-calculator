@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy Policy: Cymbal Density Calculator</title><meta name="theme-color" content="#1f2524"><link rel="icon" href="icons/icon-192.png">
+<style>
+@font-face{font-family:"CC Serif";src:url(fonts/SourceSerif4-Semibold.woff2) format("woff2");font-weight:600;font-display:swap}
+@font-face{font-family:"CC Sans";src:url(fonts/SourceSans3-Regular.woff2) format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"CC Sans";src:url(fonts/SourceSans3-Semibold.woff2) format("woff2");font-weight:600;font-display:swap}
+@font-face{font-family:"CC Sans";src:url(fonts/SourceSans3-Bold.woff2) format("woff2");font-weight:700;font-display:swap}
+:root{
+  --bg:#1f2524;--bg2:#181d1c;--card:#2a3231;--line:#3a4443;--field:#1a201f;--fieldline:#455050;
+  --text:#f2f2f0;--soft:#d8dcda;--muted:#97a3a1;--copper:#e39a3b;--copper-dk:#c98a3a;--danger:#e0705a;
+  --serif:"CC Serif",Georgia,serif;--sans:"CC Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --safe-b:env(safe-area-inset-bottom,0px);--safe-t:env(safe-area-inset-top,0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:17px;line-height:1.4}
+body{min-height:100vh;min-height:100dvh;overscroll-behavior-y:none}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+.app{max-width:520px;margin:0 auto;padding:calc(var(--safe-t) + 14px) 16px calc(92px + var(--safe-b))}
+.screen{display:none;animation:fade .18s ease}
+.screen.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.kicker{font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600}
+h1{font-family:var(--serif);font-weight:600;font-size:27px;line-height:1.15;margin:2px 0 14px;color:#fff}
+h2{font-family:var(--serif);font-weight:600;font-size:21px;margin:0 0 12px;color:#fff}
+.back{background:none;border:0;padding:6px 0;color:var(--muted);font-size:13px;letter-spacing:.06em;text-transform:uppercase;font-weight:600}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px}
+.lbl{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:7px}
+.lbl .opt{text-transform:none;letter-spacing:0;font-weight:400}
+.pair{display:flex;gap:10px}
+.field{flex:1;position:relative}
+.field input{width:100%;background:var(--field);border:1px solid var(--fieldline);border-radius:10px;padding:12px 44px 12px 14px;font-size:22px;color:#fff;outline:none;appearance:none;-webkit-appearance:none}
+.field input:focus,.txt:focus,textarea:focus,select:focus{border-color:var(--copper)}
+.field .u{position:absolute;right:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px;pointer-events:none}
+.txt,textarea,select{width:100%;background:var(--field);border:1px solid var(--fieldline);border-radius:10px;padding:11px 13px;font-size:16px;color:#fff;outline:none}
+textarea{min-height:84px;resize:vertical;line-height:1.4}
+select{appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 16px) 52%,calc(100% - 11px) 52%;background-size:5px 5px;background-repeat:no-repeat;padding-right:28px}
+.big{font-family:var(--serif);font-weight:600;font-size:38px;line-height:1.05;color:var(--copper)}
+.big .unit{font-family:var(--sans);font-weight:400;font-size:14px;color:#cdb9a0;margin-left:4px}
+.big.empty{color:#5d6866}
+.row-links{display:flex;justify-content:space-between;margin-top:12px;gap:10px}
+.link{background:none;border:0;padding:6px 0;color:var(--copper);font-size:15px;font-weight:600}
+.from{margin-top:10px;font-size:14px;color:var(--soft)}
+.from b{color:#fff}
+.hint{font-size:13px;color:var(--muted);text-align:center;margin:6px 0 0}
+.btn{display:block;width:100%;background:var(--copper);color:#1c211f;border:0;border-radius:12px;padding:14px;font-size:16px;font-weight:700;margin:10px 0 0}
+.btn:active{background:var(--copper-dk)}
+.btn2{display:block;width:100%;background:none;color:var(--copper);border:1px solid var(--copper);border-radius:12px;padding:13px;font-size:16px;font-weight:600;margin:10px 0 0}
+.btn2.danger{color:var(--danger);border-color:var(--danger)}
+.split{display:flex;gap:10px}.split>*{flex:1}
+/* nav */
+.nav{position:fixed;left:0;right:0;bottom:0;background:var(--bg2);border-top:1px solid #313938;display:flex;justify-content:center;padding:8px 0 calc(8px + var(--safe-b));z-index:20}
+.nav-in{display:flex;width:100%;max-width:520px;justify-content:space-around}
+.nav button{background:none;border:0;color:var(--muted);font-size:12.5px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 14px;min-width:84px}
+.nav button svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:1.7}
+.nav button.on{color:var(--copper)}
+/* favourites */
+.search{margin-bottom:10px}
+.filters{display:flex;gap:8px;margin-bottom:12px}
+.filters select{font-size:14px;padding:9px 26px 9px 10px}
+.item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 2px;border-bottom:1px solid #36403f;background:none;border-left:0;border-right:0;border-top:0;width:100%;text-align:left}
+.item:last-child{border-bottom:0}
+.nm{font-weight:600;font-size:16.5px;color:#fff}
+.meta{font-size:13.5px;color:var(--muted);margin-top:1px}
+.dn{color:var(--copper);font-weight:700;font-size:17px;white-space:nowrap;text-align:right}
+.dn small{display:block;font-weight:400;font-size:11px;color:var(--muted)}
+.list{padding:2px 14px}
+.empty-state{text-align:center;color:var(--soft);padding:22px 10px}
+.empty-state p{margin:6px 0;color:var(--muted);font-size:15px}
+.banner{background:#3a3226;border:1px solid var(--copper-dk);color:#f3dcc0;border-radius:12px;padding:11px 14px;font-size:15px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.banner button{background:none;border:0;color:var(--copper);font-weight:700}
+.count{color:var(--muted);font-size:14px}
+.head{display:flex;justify-content:space-between;align-items:baseline}
+/* chips */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:var(--field);border:1px solid var(--fieldline);border-radius:999px;padding:7px 13px;font-size:14.5px;color:var(--soft)}
+.chip.on{border-color:var(--copper);color:var(--copper);background:#2f2a22}
+.chip.add{border-style:dashed;color:var(--copper)}
+/* sheet */
+.dim{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:40;display:none}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:41;display:none;justify-content:center}
+.sheet-in{background:var(--card);border-radius:20px 20px 0 0;width:100%;max-width:520px;max-height:92vh;max-height:92dvh;overflow:auto;padding:10px 16px calc(18px + var(--safe-b));animation:up .22s ease}
+@keyframes up{from{transform:translateY(40px)}to{transform:none}}
+.grab{width:44px;height:4px;border-radius:3px;background:#5a6665;margin:2px auto 12px}
+.sheet .card{background:#232a29}
+.sumline{display:flex;justify-content:space-between;color:var(--soft);font-size:15px}
+.sumline b{color:var(--copper)}
+.picker-btn{width:100%;text-align:left;display:flex;justify-content:space-between;align-items:center}
+.picker-btn .ph{color:var(--muted)}
+.sec{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600;margin:14px 2px 4px}
+.tick{color:var(--copper);font-weight:700}
+/* detail */
+.notes{white-space:pre-wrap;color:var(--soft);font-size:15.5px}
+.sizes .item{padding:10px 2px}
+/* settings */
+.set-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #36403f;gap:10px}
+.set-row:last-child{border-bottom:0}
+.seg{display:flex;background:var(--field);border:1px solid var(--fieldline);border-radius:999px;padding:3px}
+.seg button{background:none;border:0;border-radius:999px;padding:6px 14px;font-size:14.5px;color:var(--muted);font-weight:600}
+.seg button.on{background:var(--copper);color:#1c211f}
+.about p{color:var(--soft);font-size:15.5px;margin:0 0 12px}
+.about a{display:block;color:var(--copper);text-decoration:none;font-weight:600;padding:9px 0;border-top:1px solid #36403f}
+.logo{display:block;width:46px;height:auto;margin:4px 0 14px}
+.fine{font-size:13px;color:var(--muted);margin-top:14px}
+.toast{position:fixed;left:50%;bottom:calc(96px + var(--safe-b));transform:translateX(-50%);background:#f2ead9;color:#1c211f;padding:10px 18px;border-radius:999px;font-weight:600;font-size:15px;z-index:60;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}
+.toast.on{opacity:1}
+.match{display:none;margin-top:14px;width:100%;align-items:center;gap:12px;background:#2f2a22;border:1px solid var(--copper-dk);border-radius:12px;padding:11px 14px;text-align:left;color:#f3dcc0;font-size:15px}
+.match.on{display:flex;animation:fade .25s ease}
+.match .dot{flex:0 0 12px;height:12px;border-radius:50%;background:var(--copper);box-shadow:0 0 0 0 rgba(227,154,59,.7);animation:glow 1.8s ease-out infinite}
+.match b{color:#fff}
+.match .go{margin-left:auto;color:var(--copper);font-weight:700}
+@keyframes glow{0%{box-shadow:0 0 0 0 rgba(227,154,59,.65)}70%{box-shadow:0 0 0 10px rgba(227,154,59,0)}100%{box-shadow:0 0 0 0 rgba(227,154,59,0)}}
+.err{color:var(--danger);font-size:14px;margin-top:6px;display:none}
+@media (min-width:600px){.app{padding-top:34px}}
+</style></head><body><div class="app about" style="padding-bottom:40px">
+<a class="back" href="./" style="text-decoration:none">&lsaquo; Calculator</a>
+<h1>Privacy Policy</h1>
+<div class="card">
+<span class="lbl">Cymbal Density Calculator</span>
+<p>This app is made by Dave Collingwood (Collingwood Cymbals, Bristol, UK). This policy was last updated on 23 October 2026.</p>
+<p><b>I don't collect any personal data.</b> The app has no accounts, no sign-up, no adverts, no analytics and no tracking.</p>
+<p>The cymbals you save to your favourites, and your settings, are stored only on your own device. They are never sent to me or anyone else. If you use "Back up favourites", the file is saved to your device, and what you do with it is up to you.</p>
+<p>The app loads its pages from my website (collingwoodcymbals.github.io), which is hosted by GitHub. Like any website host, GitHub may keep standard technical logs, such as IP addresses, for security. I don't have access to these logs. You can read GitHub's privacy statement at docs.github.com.</p>
+<p>Links in the app to my main website (collingwoodcymbals.com) open in your browser and are covered by that website's own privacy policy.</p>
+<p>The app is not aimed at children under 13.</p>
+</div>
+<div class="card">
+<span class="lbl">Questions</span>
+<p>If you have any questions about privacy, please contact me.</p>
+<a href="https://www.collingwoodcymbals.com/contact" target="_blank" rel="noopener">Contact me &rsaquo;</a>
+</div>
+</div></body></html>
