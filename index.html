@@ -117,6 +117,12 @@ select{appearance:none;-webkit-appearance:none;background-image:linear-gradient(
 .fine{font-size:13px;color:var(--muted);margin-top:14px}
 .toast{position:fixed;left:50%;bottom:calc(96px + var(--safe-b));transform:translateX(-50%);background:#f2ead9;color:#1c211f;padding:10px 18px;border-radius:999px;font-weight:600;font-size:15px;z-index:60;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}
 .toast.on{opacity:1}
+.match{display:none;margin-top:14px;width:100%;align-items:center;gap:12px;background:#2f2a22;border:1px solid var(--copper-dk);border-radius:12px;padding:11px 14px;text-align:left;color:#f3dcc0;font-size:15px}
+.match.on{display:flex;animation:fade .25s ease}
+.match .dot{flex:0 0 12px;height:12px;border-radius:50%;background:var(--copper);box-shadow:0 0 0 0 rgba(227,154,59,.7);animation:glow 1.8s ease-out infinite}
+.match b{color:#fff}
+.match .go{margin-left:auto;color:var(--copper);font-weight:700}
+@keyframes glow{0%{box-shadow:0 0 0 0 rgba(227,154,59,.65)}70%{box-shadow:0 0 0 10px rgba(227,154,59,0)}100%{box-shadow:0 0 0 0 rgba(227,154,59,0)}}
 .err{color:var(--danger);font-size:14px;margin-top:6px;display:none}
 @media (min-width:600px){.app{padding-top:34px}}
 </style>
@@ -149,6 +155,7 @@ select{appearance:none;-webkit-appearance:none;background-image:linear-gradient(
     <div class="pair"><label class="field"><input id="newD" inputmode="decimal" autocomplete="off" placeholder="18" aria-label="New diameter"><span class="u" data-u="len"></span></label></div>
     <span class="lbl" style="margin-top:16px">Weight to aim for</span>
     <div class="big empty" id="wOut">&ndash;</div>
+    <button class="match" id="matchBtn"><span class="dot"></span><span id="matchTxt"></span><span class="go">&rsaquo;</span></button>
   </div>
   <p class="hint" id="unitHint"></p>
   <p class="hint" style="margin-top:14px"><button class="link" data-go="guide">Read the guide and disclaimer &rsaquo;</button></p>
@@ -250,7 +257,7 @@ select{appearance:none;-webkit-appearance:none;background-image:linear-gradient(
     <a href="https://www.collingwoodcymbals.com" target="_blank" rel="noopener">Handmade cymbals &rsaquo;</a>
     <a href="https://www.collingwoodcymbals.com/contact" target="_blank" rel="noopener">Feedback or ideas? Contact me &rsaquo;</a>
   </div>
-  <div class="fine">Version 1.0.3 &middot; No ads, no sign-up, no data collected. Your favourites stay on this phone.</div>
+  <div class="fine">Version 1.1 &middot; No ads, no sign-up, no data collected. Your favourites stay on this phone.</div>
 </section>
 
 </div>
@@ -287,6 +294,15 @@ select{appearance:none;-webkit-appearance:none;background-image:linear-gradient(
   <input class="txt" id="mSearch" type="text" placeholder="Search or type a maker" autocomplete="off">
   <div class="card list" style="margin-top:10px" id="mList"></div>
   <button class="btn2" id="mCancel" style="border:0">Cancel</button>
+</div></div>
+
+<!-- MATCHES -->
+<div class="sheet" id="sheetMatch" style="z-index:43"><div class="sheet-in" style="box-shadow:0 -10px 30px rgba(0,0,0,.5)">
+  <div class="grab"></div>
+  <h2>Matches in your favourites</h2>
+  <p class="meta" id="matchNote" style="margin:-4px 0 10px"></p>
+  <div class="card list" id="matchList"></div>
+  <button class="btn2" id="matchClose" style="border:0">Close</button>
 </div></div>
 
 <!-- CONFIRM -->
@@ -342,7 +358,7 @@ function go(s){
   cur=s;document.querySelectorAll(".screen").forEach(function(el){el.classList.toggle("on",el.id==="s-"+s);});
   var tab=s==="detail"?"favs":(s==="about"?"settings":(s==="guide"?"calc":s));
   document.querySelectorAll(".nav button").forEach(function(b){b.classList.toggle("on",b.dataset.go===tab);});
-  if(s==="favs")renderFavs(); if(s==="settings")renderSettings();
+  if(s==="favs")renderFavs(); if(s==="settings")renderSettings(); if(s==="calc")recalc(false);
   window.scrollTo(0,0);
 }
 document.addEventListener("click",function(e){var b=e.target.closest("[data-go]");if(b){e.preventDefault();go(b.dataset.go);}});
@@ -371,6 +387,7 @@ function recalc(store){
   else{d.innerHTML="&ndash;";d.classList.add("empty");}
   if(ok&&v.n>0){w.innerHTML=fmtWt(densG(v.d,v.w)*area(v.n))+'<span class="unit">'+(st.units.wt==="oz"?"oz":"g")+'</span>';w.classList.remove("empty");}
   else{w.innerHTML="&ndash;";w.classList.add("empty");}
+  findMatches(ok&&v.n>0?v:null);
   var f=st.calc.from&&byId(st.calc.from);
   if(f&&Math.abs(f.d-v.d)<1e-6&&Math.abs(f.w-v.w)<0.01){$("fromLine").hidden=false;$("fromLine").innerHTML="From favourites: <b>"+esc(title(f))+"</b>";}
   else{$("fromLine").hidden=true;}
@@ -381,6 +398,29 @@ $("saveBtn").addEventListener("click",function(){
   openSave(null,v.d,v.w);
 });
 $("pickBtn").addEventListener("click",function(){if(!st.favs.length){toast("No favourites saved yet");return;}setPick(true);go("favs");setPick(true);});
+
+/* ---------- match light ---------- */
+// A saved cymbal "matches" when it is the new size, within 50 g of the target weight and within 0.2 g per sq in of the density
+var MATCH_G=50, MATCH_DENS=0.2, MATCH_IN=0.26, matches=[];
+function findMatches(v){
+  matches=[];
+  if(v){var dg=densG(v.d,v.w),target=dg*area(v.n);
+    matches=st.favs.filter(function(f){return f.id!==st.calc.from&&Math.abs(f.d-v.n)<=MATCH_IN&&Math.abs(f.w-target)<=MATCH_G&&Math.abs(densG(f.d,f.w)-dg)<=MATCH_DENS;})
+      .sort(function(a,b){return Math.abs(a.w-target)-Math.abs(b.w-target);});}
+  var b=$("matchBtn");
+  if(!matches.length){b.classList.remove("on");return;}
+  $("matchTxt").innerHTML=matches.length===1?"Match: <b>"+esc(title(matches[0]))+"</b>":"<b>"+matches.length+" matches</b> in your favourites";
+  b.classList.add("on");
+}
+$("matchBtn").addEventListener("click",function(){
+  var v=calcVals(),target=densG(v.d,v.w)*area(v.n);
+  $("matchNote").textContent="Within 50 g of "+fmtWtU(target)+" at "+fmtLenU(v.n)+", and within 0.2 of the density.";
+  $("matchList").innerHTML=matches.map(function(f){var diff=f.w-target;
+    return '<button class="item" data-id="'+f.id+'"><div><div class="nm">'+esc(title(f))+'</div><div class="meta">'+esc([f.maker||"Unknown",f.type||"",fmtLenU(f.d),fmtWtU(f.w)].filter(Boolean).join(" \u00b7 "))+'</div><div class="meta">'+(Math.abs(diff)<0.5?"Same weight":(fmtWtU(Math.abs(diff))+(diff>0?" heavier":" lighter")))+'</div></div><div class="dn">'+densShow(f.d,f.w)+'</div></button>';}).join("");
+  showSheet("sheetMatch");
+});
+$("matchList").addEventListener("click",function(e){var b=e.target.closest(".item");if(!b)return;var f=byId(b.dataset.id);hideSheet("sheetMatch");if(f)showDetail(f);});
+$("matchClose").addEventListener("click",function(){hideSheet("sheetMatch");});
 
 /* ---------- favourites ---------- */
 var picking=false;
