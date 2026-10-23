@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="appName">Cymbal Density Calculator</string>
+    <string name="launcherName">Density</string>
+    <string name="launchUrl">https://collingwoodcymbals.github.io/density-calculator/</string>
+    <string name="providerAuthority">com.collingwoodcymbals.density.fileprovider</string>
+    <string name="assetStatements" translatable="false">[{ \"relation\": [\"delegate_permission/common.handle_all_urls\"], \"target\": {\"namespace\": \"web\", \"site\": \"https://collingwoodcymbals.github.io\"}}]</string>
+</resources>
