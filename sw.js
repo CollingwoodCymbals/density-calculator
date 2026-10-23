@@ -1,5 +1,5 @@
 // Offline cache for the Cymbal Density Calculator. Bump VERSION on every release.
-const VERSION = "cc-density-1.0.0";
+const VERSION = "cc-density-1.0.2";
 const FILES = [
   "./", "index.html", "manifest.webmanifest",
   "fonts/SourceSerif4-Semibold.woff2", "fonts/SourceSans3-Regular.woff2",
