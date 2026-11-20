@@ -1,0 +1,10 @@
+{
+  "appId": "com.collingwoodcymbals.density",
+  "appName": "Cymbal Density",
+  "webDir": "www",
+  "ios": {
+    "contentInset": "never",
+    "backgroundColor": "#1f2524",
+    "scrollEnabled": true
+  }
+}
