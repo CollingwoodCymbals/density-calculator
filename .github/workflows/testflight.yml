@@ -1,0 +1,36 @@
+name: TestFlight public link
+
+# Runs when the setup script changes, or by hand.
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "ios-app/tools/testflight_setup.py"
+      - ".github/workflows/testflight.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pyjwt cryptography requests
+      - name: Set up TestFlight
+        env:
+          KEY_ID: Y2R5S64KPM
+          ISSUER: 92c278e5-9642-4ec0-9a9e-6b734c0b4006
+          KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+        run: python ios-app/tools/testflight_setup.py
+      - name: Save result
+        if: always()
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git add ios-app/testflight-status.txt || true
+          git commit -m "TestFlight status" || true
+          git push || true
