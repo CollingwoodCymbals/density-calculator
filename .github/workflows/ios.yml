@@ -2,7 +2,7 @@ name: Build iPhone app
 
 # On every push to the app or iPhone files this checks the iPhone app still builds.
 # Run it by hand ("Run workflow") to sign it and send a build to App Store Connect / TestFlight.
-# Needs repo secrets: APPLE_TEAM_ID, ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_P8 (the full text of the .p8 key).
+# Needs one repo secret: ASC_KEY_P8 (the full text of the "Density app upload" App Store Connect API key, .p8 file).
 
 on:
   workflow_dispatch:
@@ -42,9 +42,9 @@ jobs:
         if: github.event_name == 'workflow_dispatch'
         working-directory: ios-app/ios/App
         env:
-          TEAM: ${{ secrets.APPLE_TEAM_ID }}
-          KEY_ID: ${{ secrets.ASC_KEY_ID }}
-          ISSUER: ${{ secrets.ASC_ISSUER_ID }}
+          TEAM: W5TF4B5MYQ
+          KEY_ID: Y2R5S64KPM
+          ISSUER: 92c278e5-9642-4ec0-9a9e-6b734c0b4006
           KEY_P8: ${{ secrets.ASC_KEY_P8 }}
         run: |
           KEY="$RUNNER_TEMP/AuthKey_$KEY_ID.p8"
