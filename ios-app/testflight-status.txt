@@ -1,7 +1,8 @@
-2026-11-20 23:08 UTC
+2026-11-24 08:57 UTC
 Beta app info set
 Beta review contact set
 Build 5 state VALID
 Build added to group 'Public link'
-Beta review state: WAITING_FOR_REVIEW
+POST betaAppReviewSubmissions -> 422: The build is not in a valid processing state for this operation.
+Beta review state: APPROVED
 PUBLIC LINK: https://testflight.apple.com/join/5DGJAMt9
