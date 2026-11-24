@@ -1,3 +1,4 @@
+# status check 24 Nov
 """Sets up an external TestFlight public link for the newest build and sends it to Beta App Review.
 Runs in GitHub Actions with the App Store Connect API key. Contact details are copied from the
 app's existing App Review details, so none are stored here. Writes a short status file."""
